@@ -129,7 +129,10 @@ char execute_command(char* command){
 	else if(strcmp(subcommands[0],"clear")==0){
 		printf(CLEAR);
 	}
-	else if(strcmp(subcommands[0],"exit")==0){return 1;}
+	else if(strcmp(subcommands[0],"exit")==0){
+		free_string_splits(subcommands);
+		return 1;
+	}
 	else
 	{
 		printf("%s: no es un comando valido\n",subcommands[0]);
