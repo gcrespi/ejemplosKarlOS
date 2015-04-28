@@ -125,6 +125,7 @@ char execute_command(char* command){
 	}
 	else if(strcmp(subcommands[0],"rmnode")==0){
 		//rmnode(subcommands[1]);
+		//franco estuvo aqui!!
 	}
 	else if(strcmp(subcommands[0],"clear")==0){
 		printf(CLEAR);
