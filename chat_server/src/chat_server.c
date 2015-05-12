@@ -39,7 +39,7 @@ int main(void) {
 	struct sockaddr_in socketaddr, socketaddr_cli;
 	socketaddr.sin_family = AF_INET;
 	socketaddr.sin_port = htons(3490);
-	socketaddr.sin_addr.s_addr = inet_addr("192.168.0.68");
+	socketaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	memset(&(socketaddr.sin_zero),'\0',8);
 
 	int listener = socket(AF_INET,SOCK_STREAM,0), socketfd_cli;
