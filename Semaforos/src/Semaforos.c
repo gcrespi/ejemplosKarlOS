@@ -13,6 +13,9 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <errno.h>
+#include <commons/collections/list.h>
+#include <commons/string.h>
+#include <cspecs/cspec.h>
 
 sem_t semaforo1;
 sem_t semaforo2;
