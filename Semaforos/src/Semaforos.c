@@ -126,6 +126,7 @@ void funcionDeFiltrado(t_list *lista){
 		funcionDeMuestra(filtrados);
 		printf("fin de muestra de filtrados por edad");
 		sem_post(&semaforo1);
+		free(filtrados);
 	}
 }
 
