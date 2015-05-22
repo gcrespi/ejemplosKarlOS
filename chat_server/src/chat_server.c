@@ -18,12 +18,34 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 //Defines
-#define BACKLOG 5
-#define MAX_MSG 100
+#define BACKLOG 5	//cola max de espera en accept
+#define MAX_MSG 100	//maxima longitud del mensaje
+#define DEST_PORT 3490 //puerto de destino
+#define SRC_IP "127.0.0.1" //Ip de destino
 
 //Prototypes
+
+void obviarMensajeDePuertoOcupado(int socket_fd)
+{
+	int yes=1;
+	if (setsockopt(socket_fd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
+		perror("setsockopt");
+		exit(1);
+	}
+}
+
+
+//-------------------------------------------------------------------------------------
+void leerStdin(char *leido, int maxLargo) {
+	fgets(leido, maxLargo, stdin);
+	if ((strlen(leido) > 0) && (leido[strlen(leido) - 1] == '\n')) {
+		leido[strlen(leido) - 1] = '\0';
+	}
+
+}
 
 int main(void) {
 
@@ -35,19 +57,19 @@ int main(void) {
 	int i; // para los for
 	int len_msg; // para la longitud de los bytes recividos
 	char msg[MAX_MSG+1]; //el buffer de los mensajes
+	int listener;	//socket que escucha nuevas conexiones
+	int socketfd_cli;	//socket que envía/recive del cliente
 
 	struct sockaddr_in socketaddr, socketaddr_cli;
 	socketaddr.sin_family = AF_INET;
 	socketaddr.sin_port = htons(3490);
-	socketaddr.sin_addr.s_addr = inet_addr("192.168.0.68");
+	socketaddr.sin_addr.s_addr = inet_addr(SRC_IP);
 	memset(&(socketaddr.sin_zero),'\0',8);
 
-	int listener = socket(AF_INET,SOCK_STREAM,0), socketfd_cli;
-	int yes=1;
-	if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
-		perror("setsockopt");
-		exit(1);
-	}
+	listener = socket(AF_INET,SOCK_STREAM,0);
+
+	obviarMensajeDePuertoOcupado(listener);
+
 	bind(listener, (struct sockaddr*) &socketaddr,sizeof(struct sockaddr));
 
 	listen(listener, BACKLOG);
@@ -70,8 +92,7 @@ int main(void) {
 					printf("Tiene una solicitud de conexion con la IP: %s. Aceptar? s/n: ",inet_ntoa(socketaddr_cli.sin_addr));
 					char caracter_valido=0, acepta[100];
 					do {
-						fgets(acepta,100,stdin);  //  <- ACA HAY UN BUG QUE NO SE RESOLVER
-						acepta[strlen(acepta)-1] = '\0';
+						leerStdin(acepta,100);
 
 						if (strcmp(acepta,"n")==0 || strcmp(acepta,"N")==0) {
 							send(socketfd_cli, "El servidor no ha aceptado tu solicitud.", 40, 0);
@@ -92,17 +113,22 @@ int main(void) {
 				}
 				else {
 					len_msg = recv(i,msg,sizeof(msg),0);
-					if (len_msg==0){
-						printf("%s cerro conexion\n",inet_ntoa(socketaddr_cli.sin_addr));
+					if ((len_msg==0)||(strcmp(msg,":exit")==0)){
+						if(len_msg==0) {
+							printf("%s cerro conexion\n",inet_ntoa(socketaddr_cli.sin_addr));
+						} else {
+							printf("%s solicito salir\n",inet_ntoa(socketaddr_cli.sin_addr));
+						}
+
 						close(i);
 						FD_CLR(i, &master);
 					}
 					else {
-						msg[len_msg-1] = '\0';
+						msg[len_msg] = '\0';
 						printf("%s dice: %s\n",inet_ntoa(socketaddr_cli.sin_addr),msg);
 
 						printf("Tu: ");
-						fgets(msg,MAX_MSG+1,stdin);
+						leerStdin(msg,MAX_MSG+1);
 						send(i,msg,strlen(msg),0);
 					}
 				}
