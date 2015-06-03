@@ -14,16 +14,18 @@
 //#define pathArchivoMapeado "/home/utnso/archivoBasura.txt"
 #define pathArchivoMapeado "/home/utnso/archivoBasura.dat"
 
+void cargarBloque(){
+
+}
+
 int main(int argc, char *argv[])
 {
     int fd, offset_byte=0;
     int offset_block;
     int block_size=4*1024;
     char *data;
-    char cadena_a_agregar[]= "lendro rodriguez 21\nfranco aiello 22 ";
+    char cadena_a_agregar[]= "lendro rodriguez 21\nfranco aiello 22";
     struct stat sbuf;
-
-
 
     if (argc != 2) {
         fprintf(stderr, "usage: mmapdemo offset\n");
@@ -54,9 +56,8 @@ int main(int argc, char *argv[])
 
 //  printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
 
-    int pos_a_escribir = offset_block*block_size + offset_byte;
 
-    //asasd
+    int pos_a_escribir = offset_block*block_size + offset_byte;
     memcpy(data+pos_a_escribir, cadena_a_agregar, strlen(cadena_a_agregar));
     data[pos_a_escribir+strlen(cadena_a_agregar)]='\0';
 
