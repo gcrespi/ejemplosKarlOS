@@ -11,7 +11,8 @@
 #include <commons/string.h>
 #include <commons/config.h>
 
-#define pathArchivoMapeado "/home/utnso/archivoBasura.txt"
+//#define pathArchivoMapeado "/home/utnso/archivoBasura.txt"
+#define pathArchivoMapeado "/home/utnso/archivoBasura.dat"
 
 int main(int argc, char *argv[])
 {
@@ -19,8 +20,10 @@ int main(int argc, char *argv[])
     int offset_block=0;
     int block_size=4*1024;
     char *data;
-    char* agregar;
-//    struct stat sbuf;
+    char cadena_a_agregar[]= "lendro rodriguez 21\nfranco aiello 22 ";
+    struct stat sbuf;
+
+
 
     if (argc != 2) {
         fprintf(stderr, "usage: mmapdemo offset\n");
@@ -28,8 +31,12 @@ int main(int argc, char *argv[])
     }
 
     if ((fd = open(pathArchivoMapeado, O_RDWR)) == -1) {
-        perror("open");
+        perror("open()");
         exit(1);
+    }
+
+    if(fstat(fd, &sbuf) == -1) {
+    	perror("fstat()");
     }
 
     offset_byte = atoi(argv[1]);
@@ -38,22 +45,19 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    data = mmap((caddr_t)0, block_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset_block*block_size);
+    data = mmap((caddr_t)0, sbuf.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
     if (data == (caddr_t)(-1)) {
         perror("mmap");
         exit(1);
     }
 
-    printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
+//    printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
 
-    agregar= "lendro rodriguez 21\nfranco aiello 22 \0";
-    //agregar[strlen(agregar)-1]='\0';
-    strncpy(data, agregar,strlen(agregar));
+    int pos_a_escribir = offset_block*block_size + offset_byte;
 
-    //char **parametrosSeparados;
-
-    //parametrosSeparados = string_split(data, "\0");
+    memcpy(data+pos_a_escribir, cadena_a_agregar, strlen(cadena_a_agregar));
+    data[pos_a_escribir+strlen(cadena_a_agregar)]='\0';
 
     printf("info bloque: %s\n", &(data[0]));
 
