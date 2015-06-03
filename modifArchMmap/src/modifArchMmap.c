@@ -16,8 +16,8 @@
 
 int main(int argc, char *argv[])
 {
-    int fd, offset_byte;
-    int offset_block=0;
+    int fd, offset_byte=0;
+    int offset_block;
     int block_size=4*1024;
     char *data;
     char cadena_a_agregar[]= "lendro rodriguez 21\nfranco aiello 22 ";
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     	perror("fstat()");
     }
 
-    offset_byte = atoi(argv[1]);
+    offset_block = atoi(argv[1]);
     if (offset_byte < 0 || offset_byte > block_size-1) {
         fprintf(stderr, "mmapdemo: offset must be in the range 0-%d\n",(int)block_size-1);
         exit(1);
@@ -52,16 +52,15 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-//    printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
+//  printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
 
     int pos_a_escribir = offset_block*block_size + offset_byte;
 
+    //asasd
     memcpy(data+pos_a_escribir, cadena_a_agregar, strlen(cadena_a_agregar));
     data[pos_a_escribir+strlen(cadena_a_agregar)]='\0';
 
-    printf("info bloque: %s\n", &(data[0]));
-
-
+    printf("info bloque: %s\n", &(data[pos_a_escribir]));
 
     close(fd);
     return 0;
