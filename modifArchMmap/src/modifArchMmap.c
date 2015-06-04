@@ -13,9 +13,9 @@
 
 //#define pathArchivoMapeado "/home/utnso/archivoBasura.txt"
 #define pathArchivoMapeado "/home/utnso/archivoBasura.dat"
-
+#define block_size 4*1024
 char *data;
-int block_size=4*1024;
+//int block_size=4*1024;
 
 void cargarBloque(int nroBloque, char* info, int offset_byte){
 	 int pos_a_escribir = nroBloque*block_size + offset_byte;
@@ -29,12 +29,19 @@ void mostrarBloque(int nroBloque){
 
 }
 
+void leerStdin(char *leido,int maxLargo)
+{
+	fgets(leido,maxLargo,stdin);
+	if((strlen(leido)>0) && (leido[strlen(leido)-1]=='\n'))
+	{	leido[strlen(leido)-1]='\0';}
+
+}
 
 int main(int argc, char *argv[])
 {
     int fd, offset_byte=0;
     int offset_block;
-    char cadena_a_agregar[]= "lendro rodriguez 21\nfranco aiello 22";
+    char cadena_a_agregar[block_size+1] = "";
     struct stat sbuf;
 
     if (argc != 2) {
@@ -63,10 +70,16 @@ int main(int argc, char *argv[])
         perror("mmap");
         exit(1);
     }
-
 //  printf("byte at Block %d, offset %d is '%s'\n",offset_block, offset_byte, data);
 
+    printf(">");
+    leerStdin(cadena_a_agregar,block_size);
+
     cargarBloque(offset_block,cadena_a_agregar,offset_byte);
+
+
+    printf("nro bloque>");
+    scanf("%d",&offset_block);
 
     mostrarBloque(offset_block);
 
