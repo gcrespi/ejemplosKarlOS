@@ -48,7 +48,7 @@ void liberarLista(t_list *lista);
 
 //definición de las funciones-----------------------------------------------------------------------------------------------------
 
-
+//HolaKAce
 //Funcion para crear un elemento de tipo t_persona de la lista--------------------------------------------------------------------
 t_persona *persona_create(char *nombre, int edad, double dni){
 	t_persona *nuevo = malloc(sizeof(t_persona));
